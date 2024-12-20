@@ -27,7 +27,7 @@ const AddJob = () => {
       try{
         const res = await axiosPublic.post('/add-jobs', restData);
         const data = await res?.data;
-        console.log("Response from server:", data);
+        // console.log("Response from server:", data);
 
         if(data?.insertedId){
           reset();
@@ -38,7 +38,7 @@ const AddJob = () => {
     };
     fetchData();
     
-    console.log("Rest data:", restData);
+    // console.log("Rest data:", restData);
   }
 
   return (
