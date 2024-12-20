@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import useAxiosPublic from '../hooks/useAxiosPublic';
 import { AuthContext } from '../providers/AuthProvider';
 import { format } from 'date-fns';
+import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 
 const MyPostedJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -10,17 +12,55 @@ const MyPostedJobs = () => {
   const axiosPublic = useAxiosPublic();
 
   useEffect(() => {
-    const fetchData = async() => {
-      try{
-        const res = await axiosPublic.get(`/get-jobs?email=${user?.email}`);
-        const data = await res?.data;
-        setJobs(data);
-      }catch(err){
-        console.error(err);
-      }
-    };
     fetchData();
   }, [axiosPublic, setJobs]);
+
+  // fetchData
+  const fetchData = async() => {
+    try{
+      const res = await axiosPublic.get(`/get-jobs?email=${user?.email}`);
+      const data = await res?.data;
+      setJobs(data);
+    }catch(err){
+      console.error(err);
+    }
+  };
+
+  // handleDelete
+  const handleDelete = id => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const fetchDeleteData = async() => {
+          try{
+            const res = await axiosPublic.delete(`/add-jobs/${id}`);
+            const data = await res?.data;
+            // console.log("Job delete response from server:", data);
+
+            if(data){
+              Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success"
+              });
+              fetchData();
+            }
+          }catch(err){
+            console.error(err);
+            toast.error(err.message);
+          }
+        };
+        fetchDeleteData();
+      }
+    });
+  }
 
   return (
     <section className='container px-4 mx-auto pt-12'>
@@ -101,10 +141,10 @@ const MyPostedJobs = () => {
                               </p>
                             </div>
                           </td>
-                          <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>{description?.length > 35 ? description.substring(0, 35)+'...' : undefined}</td>
+                          <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>{description?.length > 35 ? description.substring(0, 20)+'...' : undefined}</td>
                           <td className='px-4 py-4 text-sm whitespace-nowrap'>
                             <div className='flex items-center gap-x-6'>
-                              <button className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none'>
+                              <button className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none' onClick={() => handleDelete(_id)}>
                                 <svg
                                   xmlns='http://www.w3.org/2000/svg'
                                   fill='none'
