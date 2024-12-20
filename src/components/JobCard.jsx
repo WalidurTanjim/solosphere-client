@@ -9,14 +9,14 @@ const JobCard = ({ job }) => {
 
   return (
     <Link
-      to={`/job/1`}
+      to={`/job/${_id}`}
       className='w-full max-w-sm px-4 py-3 bg-white rounded-md shadow-md hover:scale-[1.05] transition-all'
     >
       <div className='flex items-center justify-between'>
         <span className='text-xs font-light text-gray-800 '>
           Deadline: {format(new Date(deadline), 'P')}
         </span>
-        <span className='px-3 py-1 text-[8px] text-blue-800 uppercase bg-blue-200 rounded-full '>
+        <span className={`px-3 py-1 text-[8px] ${category === 'Web Development' ? 'text-blue-500 bg-blue-100/60' : ''} ${category === 'Graphics Design' ? 'text-green-500 bg-green-100/60' : ''} ${category === 'Digital Marketing' ? 'text-red-500 bg-red-100/60' : ''} text-[9px] rounded-full `}>
           {category}
         </span>
       </div>

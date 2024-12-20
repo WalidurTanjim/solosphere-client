@@ -1,10 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import useAxiosPublic from '../hooks/useAxiosPublic';
+import { useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { format } from 'date-fns';
 
 const JobDetails = () => {
+  const [job, setJob] = useState({});
+  console.log(job);
   const [startDate, setStartDate] = useState(new Date())
+  const axiosPublic = useAxiosPublic();
+  const { id } = useParams();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async() => {
+    try{
+      const res = await axiosPublic.get(`/add-jobs/${id}`);
+      const data = await res?.data;
+      setJob(data);
+    }catch(err){
+      console.error(err);
+      toast.error(err.message);
+    }
+  }
 
   return (
     <div className='flex flex-col md:flex-row justify-around gap-5  items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto '>
@@ -12,22 +35,21 @@ const JobDetails = () => {
       <div className='flex-1  px-4 py-7 bg-white rounded-md shadow-md md:min-h-[350px]'>
         <div className='flex items-center justify-between'>
           <span className='text-sm font-light text-gray-800 '>
-            Deadline: 28/05/2024
+            {/* Deadline: {format(new Date(job?.deadline), 'P')} */}
+            Deadline: {job?.deadline}
           </span>
           <span className='px-4 py-1 text-xs text-blue-800 uppercase bg-blue-200 rounded-full '>
-            Web Development
+            {job?.job_title}
           </span>
         </div>
 
         <div>
           <h1 className='mt-2 text-3xl font-semibold text-gray-800 '>
-            Web Development
+            {job?.category}
           </h1>
 
           <p className='mt-2 text-lg text-gray-600 '>
-            Dramatically redefine bleeding-edge infrastructures after
-            client-focused value. Intrinsicly seize user-centric partnerships
-            through out-of-the-box architectures. Distinctively.
+            {job?.description}
           </p>
           <p className='mt-6 text-sm font-bold text-gray-600 '>
             Buyer Details:
@@ -35,21 +57,21 @@ const JobDetails = () => {
           <div className='flex items-center gap-5'>
             <div>
               <p className='mt-2 text-sm  text-gray-600 '>
-                Name: Programming-Hero Instructors
+                Name: {job?.buyer?.name}
               </p>
               <p className='mt-2 text-sm  text-gray-600 '>
-                Email: instructors@programming-hero.com
+                Email: {job?.buyer?.email}
               </p>
             </div>
             <div className='rounded-full object-cover overflow-hidden w-14 h-14'>
               <img
-                src='https://i.ibb.co.com/qsfs2TW/Ix-I18-R8-Y-400x400.jpg'
+                src={job?.buyer?.photo}
                 alt=''
               />
             </div>
           </div>
           <p className='mt-6 text-lg font-bold text-gray-600 '>
-            Range: $500 - $600
+            Range: ${job?.min_price} - ${job?.max_price}
           </p>
         </div>
       </div>
