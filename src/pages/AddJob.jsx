@@ -4,11 +4,14 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { AuthContext } from '../providers/AuthProvider'
 import useAxiosPublic from '../hooks/useAxiosPublic'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 const AddJob = () => {
   const { user } = useContext(AuthContext);
   const [startDate, setStartDate] = useState(new Date());
   const axiosPublic = useAxiosPublic();
+  const navigate = useNavigate();
 
   const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
   const onSubmit = (data) => {
@@ -30,9 +33,12 @@ const AddJob = () => {
         // console.log("Response from server:", data);
 
         if(data?.insertedId){
+          toast.success('Data Added Successfully');
           reset();
+          navigate('/my-posted-jobs');
         }
       }catch(err){
+        toast.error("Something Went Wrong!!");
         console.error(err);
       }
     };
