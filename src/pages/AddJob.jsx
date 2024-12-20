@@ -3,12 +3,14 @@ import { useForm } from "react-hook-form"
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { AuthContext } from '../providers/AuthProvider'
+import useAxiosPublic from '../hooks/useAxiosPublic'
 
 const AddJob = () => {
   const { user } = useContext(AuthContext);
   const [startDate, setStartDate] = useState(new Date());
+  const axiosPublic = useAxiosPublic();
 
-  const { register, handleSubmit, watch, formState: { errors }, } = useForm();
+  const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm();
   const onSubmit = (data) => {
     data.buyer = {
       email: user?.email,
@@ -16,9 +18,25 @@ const AddJob = () => {
       photo: user?.photoURL
     }
     data.deadline= startDate;
-    
+    data.bid_count = 0;
+
     // filtered data without email
     const { email, ...restData } = data;
+
+    const fetchData = async() => {
+      try{
+        const res = await axiosPublic.post('/add-jobs', restData);
+        const data = await res?.data;
+        console.log("Response from server:", data);
+
+        if(data?.insertedId){
+          reset();
+        }
+      }catch(err){
+        console.error(err);
+      }
+    };
+    fetchData();
     
     console.log("Rest data:", restData);
   }
