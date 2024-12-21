@@ -58,11 +58,11 @@ const JobDetails = () => {
             text: "Bid Successfully!",
             icon: "success"
           });
-          navigate('/bid-requests')
+          navigate('/my-bids')
         }
       }catch(err){
         console.error(err);
-        toast.error(err.message)
+        toast.error(err?.response?.data || err?.message)
       }
     };
     addBidHandler();
